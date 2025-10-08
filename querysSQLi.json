@@ -4,7 +4,7 @@
       {
         "name": "Version",
         "command": "SELECT @@VERSION;",
-        "description": "Obtiene la versión del sistema operativo/Windows"
+        "description": "Obtiene la version y el tipo de la base de datos MSSQL"
       },
       {
         "name": "List Users",
@@ -251,11 +251,11 @@
         "commands": [
           {
             "command": "SELECT @@VERSION;",
-            "description": "Retrieves the system information of the current installation of SQL Server"
+            "description": "Obtiene la version y el tipo de la base de datos MYSQL"
           },
           {
             "command": "SELECT version();",
-            "description": "Selects the specific version of a Server"
+            "description": "Obtiene la version y el tipo de la base de datos MYSQL"
           }
         ]
       },
@@ -551,12 +551,12 @@
         "name": "Version",
         "commands": [
           {
-            "command": "SELECT banner FROM v$version WHERE banner LIKE 'Oracle%';",
-            "description": "Obtains Oracle version and build information"
+            "command": "SELECT banner FROM v$version",
+            "description": "Obtiene la version y el tipo de la base de datos ORACLE"
           },
           {
             "command": "SELECT version FROM v$instance;",
-            "description": "Displays current database information such as host name, status, startup time, etc."
+            "description": "Obtiene la version y el tipo de la base de datos ORACLE"
           }
         ]
       },
@@ -666,7 +666,7 @@
       {
         "name": "Version",
         "command": "SELECT version();",
-        "description": "Obtains the version and build information of the database"
+        "description": "Obtiene la version y el tipo de la base de datos POSTGRESQL"
       },
       {
         "name": "List Users",
