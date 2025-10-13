@@ -16,19 +16,19 @@
         "commands": [
           {
             "command": "SELECT user_name();",
-            "description": "Obtiene el nombre del usuario recientemente autenticado"
+            "description": "Obtiene el nombre del usuario recientemente autenticado MSSQL"
           },
           {
             "command": "SELECT system_user;",
-            "description": "Obtiene el valor actual de system_user"
+            "description": "Obtiene el valor actual de system_user MSSQL"
           },
           {
             "command": "SELECT user;",
-            "description": "Obtiene el nombre del usuario impersonificado"
+            "description": "Obtiene el nombre del usuario impersonificado MSSQL"
           },
           {
             "command": "SELECT loginname FROM master.sysprocesses WHERE spid = @@SPID;",
-            "description": "Obtiene el nombre de login de la tabla master.sysprocesses"
+            "description": "Obtiene el nombre de login de la tabla master.sysprocesses MSSQL"
           }
         ]
       },
@@ -576,7 +576,7 @@
       {
         "name": "Current User",
         "command": "SELECT user FROM dual;",
-        "description": "Obtains current user from the table 'dual'"
+        "description": "Obtains current user from the table 'dual' ORACLE"
       },
       {
         "name": "List all Databases",
@@ -678,23 +678,23 @@
         "commands": [
           {
             "command": "SELECT user;",
-            "description": "Obtains a name of recently logged in user"
+            "description": "Obtains a name of recently logged in user POSTGRESQL" 
           },
           {
             "command": "SELECT current_user;",
-            "description": "Obtains a name of current user"
+            "description": "Obtains a name of current user POSTGRESQL"
           },
           {
             "command": "SELECT session_user;",
-            "description": "Obtains a name of current session user"
+            "description": "Obtains a name of current session user POSTGRESQL"
           },
           {
             "command": "SELECT username FROM pg_user;",
-            "description": "Obtains the column 'username' from table 'pg_user'"
+            "description": "Obtains the column 'username' from table 'pg_user' POSTGRESQL"
           },
           {
             "command": "SELECT getpgusername();",
-            "description": "Obtains the user name in current session"
+            "description": "Obtains the user name in current session POSTGRESQL"
           }
         ]
       },
