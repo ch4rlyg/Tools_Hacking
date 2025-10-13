@@ -37,11 +37,11 @@
         "commands": [
           {
             "command": "SELECT name FROM master.sysdatabases;",
-            "description": "Lista todas las bases de datos desde master.sysdatabases"
+            "description": "Lista todas las bases de datos desde master.sysdatabases MSSQL"
           },
           {
             "command": "SELECT DB_NAME(N);",
-            "description": "Obtiene el nombre de la base de datos en la posición N (N=0,1,2,3,...)"
+            "description": "Obtiene el nombre de la base de datos en la posición N (N=0,1,2,3,...) MMSSQL"
           }
         ]
       },
@@ -269,11 +269,11 @@
         "commands": [
           {
             "command": "SELECT user();",
-            "description": "Obtains the current MySQL user name and hostname"
+            "description": "Obtains the current MySQL user name and hostname - MYSQL"
           },
           {
             "command": "SELECT system_user();",
-            "description": "Obtains the current value of system_user"
+            "description": "Obtains the current value of system_user - MYSQL"
           }
         ]
       },
@@ -282,11 +282,11 @@
         "commands": [
           {
             "command": "SELECT schema_name FROM information_schema.schemata;",
-            "description": "Obtains schema_name column with list of databases from schemata table (MySQL >= v5.0)"
+            "description": "Obtains schema_name column with list of databases from schemata table (MySQL >= v5.0) MYSQL"
           },
           {
             "command": "SELECT distinct(db) FROM mysql.db;",
-            "description": "Lists distinct databases from mysql.db table (privileged)",
+            "description": "Lists distinct databases from mysql.db table (privileged) MYSQL",
             "privileged": true
           }
         ]
@@ -583,11 +583,11 @@
         "commands": [
           {
             "command": "SELECT DISTINCT owner FROM all_tables;",
-            "description": "Lists schemas (one per user)"
+            "description": "Lists schemas (one per user) ORACLE"
           },
           {
             "command": "tnscmd services | status",
-            "description": "Queries TNS listener for other databases"
+            "description": "Queries TNS listener for other databases ORACLE"
           }
         ]
       },
@@ -701,7 +701,7 @@
       {
         "name": "List all Databases",
         "command": "SELECT datname FROM pg_database;",
-        "description": "Obtains the list of database in column 'database' from table 'pg_database'"
+        "description": "Obtains the list of database in column 'database' from table 'pg_database' POSTGRESQL"
       },
       {
         "name": "Current Database",
