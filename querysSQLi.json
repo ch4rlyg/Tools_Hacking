@@ -273,7 +273,11 @@
           },
           {
             "command": "SELECT system_user();",
-            "description": "Obtains the current value of system_user MYSQL"
+            "description": "Obtains the current MySQL user name and hostname MYSQL"
+          },
+          {
+            "command": "SELECT current_user();",
+            "description": "Obtains the current MySQL user name and hostname MYSQL"
           }
         ]
       },
