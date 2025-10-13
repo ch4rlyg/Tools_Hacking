@@ -281,6 +281,15 @@
           }
         ]
       },
+            {
+        "name": "Privileges for user",
+        "commands": [
+          {
+            "command": "select privilege_type FROM information_schema.user_privileges where grantee = \"'uhc'@'localhost'\"",
+            "description": "Priveleges for user 'uhc'@'localhost' MYSQL"
+          }
+        ]
+      },
       {
         "name": "List all Databases",
         "commands": [
