@@ -50,7 +50,7 @@ class HTTPRequest:
         except socket.timeout:
             print(f"Timeout after {self.timeout} seconds")
 
-if __name__ == "__main__":
-    req = HTTPRequest(host="localhost", port=1000)
-    res = req.send()
-    print(res)
+#if __name__ == "__main__":
+#    req = HTTPRequest(host="localhost", port=1000)
+#    res = req.send()
+#    print(res)
