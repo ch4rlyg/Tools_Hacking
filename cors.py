@@ -2,26 +2,46 @@ from HttpRequest import HTTPRequest
 import re
 
 class Cors:
-    def __init__(self, host="", port="", headers={"Origin":"evil.com"}, vulnerable=False, output=""):
+    def __init__(self, host="", port="", headers={}, output=""):
         self.host = host
         self.port = port
         self.headers = headers
-        self.vulnerable = vulnerable
         self.output = output
 
     def Scenario1(self):
-        req = HTTPRequest(host=self.host, port=self.port, headers=self.headers)
+        req = HTTPRequest(host=self.host, port=self.port, headers={"Origin":"evil.com"})
         res = req.send()
         match0 = re.search(r"Access-Control-Allow-Origin: (.*)", res)
         match1 = re.search(r"Access-Control-Allow-Credentials: true", res)
         if "Access-Control-Allow-Origin: evil.com" in match0.group(0) and "Access-Control-Allow-Credentials: true" in match1.group(0):
-            self.vulnerable = True
+            return True
         else:
-            self.vulnerable = False
+            return False
+    
+    def Scenario2(self):
+        req = HTTPRequest(host=self.host, port=self.port, headers={"Origin":"null"})
+        res = req.send()
+        match0 = re.search(r"Access-Control-Allow-Origin: (.*)", res)
+        match1 = re.search(r"Access-Control-Allow-Credentials: true", res)
+        if "Access-Control-Allow-Origin: null" in match0.group(0) and "Access-Control-Allow-Credentials: true" in match1.group(0):
+            return True
+        else:
+            return False
+    
+    def Scenario3(self):
+        req = HTTPRequest(host=self.host, port=self.port, headers={"Origin":f"subdomain.{self.host}"})
+        res = req.send()
+        print(res)
+        match0 = re.search(r"Access-Control-Allow-Origin: (.*)", res)
+        match1 = re.search(r"Access-Control-Allow-Credentials: true", res)
+        if f"Access-Control-Allow-Origin: subdomain.{self.host}" in match0.group(0) and "Access-Control-Allow-Credentials: true" in match1.group(0):
+            return True
+        else:
+            return False
+
 
     def Result(self):
-        self.Scenario1()
-        if self.vulnerable:
+        if self.Scenario1() or self.Scenario2() or self.Scenario3():
             self.output = f"[+] Vulnerable: CORS Misconfiguration in {self.host}:{self.port}"
         else:
             self.output = f"[x] Not vulnerable: CORS Misconfiguration in {self.host}:{self.port}"
