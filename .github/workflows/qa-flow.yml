@@ -1,0 +1,17 @@
+name: QA Flow
+
+on:
+#    push:
+#        branches:
+#        - main
+    pull_request:
+        branches:
+        - main
+
+jobs:
+    test_scan:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: test
+              run: echo "Running QA Flow"
